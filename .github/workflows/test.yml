@@ -1,0 +1,48 @@
+name: "[DEBUG] run integration tests and smoke test build"
+
+on:
+  push:
+    branches:
+      - dev
+
+  pull_request:
+    branches:
+      - dev
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Release
+    runs-on: macos-latest
+
+    steps:
+        #1 Checkout Repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+        #2 Setup Java
+      - name: Set Up Java
+        uses: actions/setup-java@v3.12.0
+        with:
+          distribution: 'oracle'
+          java-version: '17'
+
+        #3 Setup Flutter
+      - name: Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+
+        #4 Install Dependencies
+      - name: Install Dependencies
+        run: flutter pub get
+
+        #5 Run tests
+      - name: Run integration tests
+        run: flutter test
+
+        #6 Building App Bundle (aab)
+      - name: Build appBundle
+        run: flutter build appbundle --debug
